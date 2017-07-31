@@ -1,7 +1,4 @@
-/**
- * 
- */
-package org.infobip.ipcore;
+package com.mmimica.ajackson;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -17,10 +14,6 @@ import org.apache.commons.lang3.mutable.MutableInt;
 import org.junit.Assert;
 import org.junit.Test;
 
-/**
- * @author mmimica
- *
- */
 public class AsyncJsonParserTest {
     @Builder
     @NoArgsConstructor
