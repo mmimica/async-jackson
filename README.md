@@ -1,5 +1,5 @@
 # ajackson
-A library that wraps [actson](https://github.com/michel-kraemer/actson) to provide non-blocking behaviour or jackson [parser](https://github.com/FasterXML/jackson-core/).
+A library that wraps [actson](https://github.com/michel-kraemer/actson) to provide non-blocking behaviour for jackson [parser](https://github.com/FasterXML/jackson-core/).
 
 ## async mapper example
 Use `actson` for async non-blocking parsing. Use `jackson` for superb mapping features.
