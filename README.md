@@ -8,10 +8,8 @@ Use `actson` for async non-blocking parsing. Use `jackson` for superb mapping fe
 Consumer<JsonNode> callback = (jsonRoot) -> {
     Model model = mapper.treeToValue(jsonRoot, Model.class);
 };
-
 AsyncJsonParser parser = new AsyncJsonParser(callback);
 
 // ... in some other thread
 parser.feed(bytes)
-}
 ```
