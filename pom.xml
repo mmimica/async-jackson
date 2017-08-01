@@ -8,7 +8,6 @@
 	<packaging>jar</packaging>
 
 	<properties>
-		<actson.version>1.2.0</actson.version>
 		<jackson-core.version>2.9.0</jackson-core.version>
 	</properties>
 
@@ -41,12 +40,6 @@
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
 			<version>${jackson-core.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>de.undercouch</groupId>
-			<artifactId>actson</artifactId>
-			<version>${actson.version}</version>
 		</dependency>
 
 		<dependency>

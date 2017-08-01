@@ -1,8 +1,8 @@
 # ajackson
-A library that wraps [actson](https://github.com/michel-kraemer/actson) to provide non-blocking behaviour for jackson [parser](https://github.com/FasterXML/jackson-core/).
+A library that provides non-blocking parsing behaviour for jackson [parser](https://github.com/FasterXML/jackson-core/).
 
 ## async mapper example
-Use `actson` for async non-blocking parsing. Use `jackson` for superb mapping features.
+Use Jackson's non-blocking parser for async non-blocking parsing. Use `jackson mapper` for superb mapping features.
 
 ```java
 Consumer<JsonNode> callback = (jsonRoot) -> {
