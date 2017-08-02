@@ -81,10 +81,8 @@ public class AsyncJsonParser {
 
     /**
      * @return The root node when the whole tree is built.
-     * @throws IOException
-     * @throws NumberFormatException
      **/
-    private JsonNode buildTree(JsonToken event) throws NumberFormatException, IOException {
+    private JsonNode buildTree(JsonToken event) throws IOException {
         switch (event) {
         case FIELD_NAME:
             fieldName = parser.getCurrentName();
@@ -107,7 +105,7 @@ public class AsyncJsonParser {
                 return null;
 
         case VALUE_NUMBER_INT:
-            addLong(stack.top(), Long.parseLong(parser.getValueAsString()));
+            addLong(stack.top(), parser.getLongValue());
             return null;
 
         case VALUE_STRING:
