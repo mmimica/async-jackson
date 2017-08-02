@@ -87,10 +87,7 @@ public class AsyncJsonParser {
     private JsonNode buildTree(JsonToken event) throws NumberFormatException, IOException {
         switch (event) {
         case FIELD_NAME:
-            try {
-                fieldName = parser.getCurrentName();
-            } catch (IOException e) {
-            }
+            fieldName = parser.getCurrentName();
             return null;
 
         case START_OBJECT:
