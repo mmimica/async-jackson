@@ -14,8 +14,7 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class AsyncJsonParser {
-    private final JsonFactory jsonFactory = new JsonFactory();
-
+    private final JsonFactory jsonFactory;
     private final Consumer<JsonNode> onDone;
 
     private NonBlockingJsonParser parser;
@@ -50,6 +49,11 @@ public class AsyncJsonParser {
     private final Stack stack = new Stack();
 
     public AsyncJsonParser(Consumer<JsonNode> onDone) throws IOException {
+        this(new JsonFactory(), onDone);
+    }
+
+    public AsyncJsonParser(JsonFactory jsonFactory, Consumer<JsonNode> onDone) throws IOException {
+        this.jsonFactory = jsonFactory;
         this.onDone = onDone;
         reset();
     }
