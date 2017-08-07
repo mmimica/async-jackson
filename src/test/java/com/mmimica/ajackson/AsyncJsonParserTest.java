@@ -130,6 +130,40 @@ public class AsyncJsonParserTest {
     }
     
     @Test
+    public void test_chunks_sequenced() throws IOException {
+        MutableInt parsed = new MutableInt(0);
+        
+        AsyncJsonParser parser = new AsyncJsonParser(root -> {
+            parsed.increment();
+            try {
+                Model deserialized = mapper.treeToValue(root, Model.class);
+                Assert.assertEquals(deserialized, model);
+            } catch (JsonProcessingException e) {
+                Assert.fail(e.getMessage());
+            }
+        });
+
+        byte[] bytes = new ObjectMapper().writeValueAsBytes(model);
+        
+        byte[] allBytes = new byte[3 * bytes.length];
+        System.arraycopy(bytes, 0, allBytes, bytes.length * 0, bytes.length);
+        System.arraycopy(bytes, 0, allBytes, bytes.length * 1, bytes.length);
+        System.arraycopy(bytes, 0, allBytes, bytes.length * 2, bytes.length);
+        
+        final int CHUNK_SIZE = 20;
+        for (int i = 0; i < allBytes.length; i += CHUNK_SIZE) {
+            byte[] chunk = new byte[20];
+            int start = Math.min(allBytes.length, i);
+            int len = Math.min(CHUNK_SIZE, allBytes.length - i);
+            System.arraycopy(allBytes, start, chunk, 0, len);
+            System.out.println(new String(chunk));
+            parser.consume(chunk, len);
+        }
+
+        Assert.assertEquals(3, parsed.intValue());
+    }
+    
+    @Test
     public void testRootArray() throws IOException {
         MutableInt parsed = new MutableInt(0);
         
