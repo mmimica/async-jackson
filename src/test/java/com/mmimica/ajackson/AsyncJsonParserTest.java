@@ -78,6 +78,31 @@ public class AsyncJsonParserTest {
     }
     
     @Test
+    public void test_chunks() throws IOException {
+        MutableBoolean parsed = new MutableBoolean(false);
+        AsyncJsonParser parser = new AsyncJsonParser(root -> {
+            parsed.setValue(true);
+            try {
+                Assert.assertEquals(mapper.treeToValue(root, Model.class), model);
+            } catch (JsonProcessingException e) {
+                Assert.fail(e.getMessage());
+            }
+        });
+
+        final int CHUNK_SIZE = 20;
+        byte[] bytes = new ObjectMapper().writeValueAsBytes(model);
+        for (int i = 0; i < bytes.length; i += CHUNK_SIZE) {
+            byte[] chunk = new byte[20];
+            int start = Math.min(bytes.length, i);
+            int len = Math.min(CHUNK_SIZE, bytes.length - i);
+            System.arraycopy(bytes, start, chunk, 0, len);
+            parser.consume(chunk, len);
+        }
+
+        Assert.assertTrue(parsed.booleanValue());
+    }
+
+    @Test
     public void testSequence() throws IOException {
         MutableInt parsed = new MutableInt(0);
         
