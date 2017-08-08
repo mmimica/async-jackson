@@ -1,9 +1,5 @@
 package com.mmimica.ajackson;
 
-import java.io.IOException;
-import java.util.LinkedList;
-import java.util.function.Consumer;
-
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.core.async.ByteArrayFeeder;
@@ -13,9 +9,12 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import java.io.IOException;
+import java.util.LinkedList;
+import java.util.function.Consumer;
+
 public class AsyncJsonParser {
-    private final JsonFactory jsonFactory;
-    private final Consumer<JsonNode> onDone;
+    private final Consumer<JsonNode> onNodeDone;
 
     private NonBlockingJsonParser parser;
     private String fieldName;
@@ -48,14 +47,13 @@ public class AsyncJsonParser {
 
     private final Stack stack = new Stack();
 
-    public AsyncJsonParser(Consumer<JsonNode> onDone) throws IOException {
-        this(new JsonFactory(), onDone);
+    public AsyncJsonParser(Consumer<JsonNode> onNodeDone) throws IOException {
+        this(new JsonFactory(), onNodeDone);
     }
 
-    public AsyncJsonParser(JsonFactory jsonFactory, Consumer<JsonNode> onDone) throws IOException {
-        this.jsonFactory = jsonFactory;
-        this.onDone = onDone;
-        reset();
+    public AsyncJsonParser(JsonFactory jsonFactory, Consumer<JsonNode> onNodeDone) throws IOException {
+        this.onNodeDone = onNodeDone;
+        this.parser = (NonBlockingJsonParser) jsonFactory.createNonBlockingByteArrayParser();
     }
 
     public void consume(byte[] bytes) throws IOException {
@@ -64,23 +62,16 @@ public class AsyncJsonParser {
 
     public void consume(byte[] bytes, int length) throws IOException {
         ByteArrayFeeder feeder = parser.getNonBlockingInputFeeder();
-        feeder.feedInput(bytes, 0, length);
+        if (feeder.needMoreInput())
+            feeder.feedInput(bytes, 0, length);
 
         JsonToken event;
         while ((event = parser.nextToken()) != JsonToken.NOT_AVAILABLE) {
             JsonNode root = buildTree(event);
             if (root != null) {
-                reset();
-                onDone.accept(root);
-                return;
+                onNodeDone.accept(root);
             }
         }
-    }
-
-    private void reset() throws IOException {
-        parser = (NonBlockingJsonParser) jsonFactory.createNonBlockingByteArrayParser();
-        fieldName = null;
-        stack.clear();
     }
 
     /**
@@ -88,52 +79,52 @@ public class AsyncJsonParser {
      **/
     private JsonNode buildTree(JsonToken event) throws IOException {
         switch (event) {
-        case FIELD_NAME:
-            fieldName = parser.getCurrentName();
-            return null;
-
-        case START_OBJECT:
-            stack.push(createNode(stack.top()));
-            return null;
-
-        case START_ARRAY:
-            stack.push(createArray(stack.top()));
-            return null;
-
-        case END_OBJECT:
-        case END_ARRAY:
-            JsonNode current = stack.pop();
-            if (stack.isEmpty())
-                return current;
-            else
+            case FIELD_NAME:
+                fieldName = parser.getCurrentName();
                 return null;
 
-        case VALUE_NUMBER_INT:
-            addLong(stack.top(), parser.getLongValue());
-            return null;
+            case START_OBJECT:
+                stack.push(createNode(stack.top()));
+                return null;
 
-        case VALUE_STRING:
-            addString(stack.top(), parser.getValueAsString());
-            return null;
+            case START_ARRAY:
+                stack.push(createArray(stack.top()));
+                return null;
 
-        case VALUE_NUMBER_FLOAT:
-            addFloat(stack.top(), parser.getFloatValue());
-            return null;
+            case END_OBJECT:
+            case END_ARRAY:
+                JsonNode current = stack.pop();
+                if (stack.isEmpty())
+                    return current;
+                else
+                    return null;
 
-        case VALUE_NULL:
-            addNull(stack.top());
-            return null;
+            case VALUE_NUMBER_INT:
+                addLong(stack.top(), parser.getLongValue());
+                return null;
 
-        case VALUE_TRUE:
-            addBoolean(stack.top(), true);
-            return null;
+            case VALUE_STRING:
+                addString(stack.top(), parser.getValueAsString());
+                return null;
 
-        case VALUE_FALSE:
-            addBoolean(stack.top(), false);
-            return null;
+            case VALUE_NUMBER_FLOAT:
+                addFloat(stack.top(), parser.getFloatValue());
+                return null;
 
-        default:
-            throw new RuntimeException("Unknow json event " + event);
+            case VALUE_NULL:
+                addNull(stack.top());
+                return null;
+
+            case VALUE_TRUE:
+                addBoolean(stack.top(), true);
+                return null;
+
+            case VALUE_FALSE:
+                addBoolean(stack.top(), false);
+                return null;
+
+            default:
+                throw new RuntimeException("Unknown json event " + event);
         }
     }
 
