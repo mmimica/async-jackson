@@ -58,14 +58,19 @@ public class AsyncJsonParser {
 
     public void consume(byte[] bytes, int length) throws IOException {
         ByteArrayFeeder feeder = parser.getNonBlockingInputFeeder();
-        if (feeder.needMoreInput())
-            feeder.feedInput(bytes, 0, length);
-
-        JsonToken event;
-        while ((event = parser.nextToken()) != JsonToken.NOT_AVAILABLE) {
-            JsonNode root = buildTree(event);
-            if (root != null) {
-                onNodeDone.accept(root);
+        boolean consumed = false;
+        while (!consumed) {
+            if (feeder.needMoreInput()) {
+                feeder.feedInput(bytes, 0, length);
+                consumed = true;
+            }
+    
+            JsonToken event;
+            while ((event = parser.nextToken()) != JsonToken.NOT_AVAILABLE) {
+                JsonNode root = buildTree(event);
+                if (root != null) {
+                    onNodeDone.accept(root);
+                }
             }
         }
     }
