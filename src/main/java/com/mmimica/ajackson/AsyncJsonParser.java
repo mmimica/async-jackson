@@ -36,10 +36,6 @@ public class AsyncJsonParser {
             list.add(n);
         }
 
-        void clear() {
-            list.clear();
-        }
-
         boolean isEmpty() {
             return list.isEmpty();
         }
