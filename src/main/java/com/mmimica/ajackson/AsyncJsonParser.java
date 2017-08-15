@@ -81,6 +81,7 @@ public class AsyncJsonParser {
     private JsonNode buildTree(JsonToken event) throws IOException {
         switch (event) {
             case FIELD_NAME:
+                assert !stack.isEmpty();
                 fieldName = parser.getCurrentName();
                 return null;
 
@@ -94,6 +95,7 @@ public class AsyncJsonParser {
 
             case END_OBJECT:
             case END_ARRAY:
+                assert !stack.isEmpty();
                 JsonNode current = stack.pop();
                 if (stack.isEmpty())
                     return current;
@@ -101,26 +103,32 @@ public class AsyncJsonParser {
                     return null;
 
             case VALUE_NUMBER_INT:
+                assert !stack.isEmpty();
                 addLong(stack.top(), parser.getLongValue());
                 return null;
 
             case VALUE_STRING:
+                assert !stack.isEmpty();
                 addString(stack.top(), parser.getValueAsString());
                 return null;
 
             case VALUE_NUMBER_FLOAT:
+                assert !stack.isEmpty();
                 addFloat(stack.top(), parser.getFloatValue());
                 return null;
 
             case VALUE_NULL:
+                assert !stack.isEmpty();
                 addNull(stack.top());
                 return null;
 
             case VALUE_TRUE:
+                assert !stack.isEmpty();
                 addBoolean(stack.top(), true);
                 return null;
 
             case VALUE_FALSE:
+                assert !stack.isEmpty();
                 addBoolean(stack.top(), false);
                 return null;
 
