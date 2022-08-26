@@ -16,7 +16,7 @@ import java.util.function.Consumer;
 public class AsyncJsonParser {
     private final Consumer<JsonNode> onNodeDone;
 
-    private NonBlockingJsonParser parser;
+    private final NonBlockingJsonParser parser;
     private String fieldName;
 
     private static final class Stack {
@@ -138,19 +138,19 @@ public class AsyncJsonParser {
     }
 
     private JsonNode createNode(JsonNode current) {
-        if (ObjectNode.class.isInstance(current))
-            return ObjectNode.class.cast(current).putObject(fieldName);
-        else if (ArrayNode.class.isInstance(current))
-            return ArrayNode.class.cast(current).addObject();
+        if (current instanceof ObjectNode)
+            return ((ObjectNode) current).putObject(fieldName);
+        else if (current instanceof ArrayNode)
+            return ((ArrayNode) current).addObject();
         else
             return JsonNodeFactory.instance.objectNode();
     }
 
     private JsonNode createArray(JsonNode current) {
-        if (ObjectNode.class.isInstance(current))
-            return ObjectNode.class.cast(current).putArray(fieldName);
-        else if (ArrayNode.class.isInstance(current))
-            return ArrayNode.class.cast(current).addArray();
+        if (current instanceof ObjectNode)
+            return ((ObjectNode) current).putArray(fieldName);
+        else if (current instanceof ArrayNode)
+            return ((ArrayNode) current).addArray();
         else
             return JsonNodeFactory.instance.arrayNode();
     }
@@ -158,45 +158,45 @@ public class AsyncJsonParser {
     private void addLong(JsonNode current, long v) {
         assert current != null;
 
-        if (ObjectNode.class.isInstance(current))
-            ObjectNode.class.cast(current).put(fieldName, v);
+        if (current instanceof ObjectNode)
+            ((ObjectNode) current).put(fieldName, v);
         else
-            ArrayNode.class.cast(current).add(v);
+            ((ArrayNode) current).add(v);
     }
 
     private void addString(JsonNode current, String s) {
         assert current != null;
 
-        if (ObjectNode.class.isInstance(current))
-            ObjectNode.class.cast(current).put(fieldName, s);
+        if (current instanceof ObjectNode)
+            ((ObjectNode) current).put(fieldName, s);
         else
-            ArrayNode.class.cast(current).add(s);
+            ((ArrayNode) current).add(s);
     }
 
     private void addFloat(JsonNode current, float f) {
         assert current != null;
 
-        if (ObjectNode.class.isInstance(current))
-            ObjectNode.class.cast(current).put(fieldName, f);
+        if (current instanceof ObjectNode)
+            ((ObjectNode) current).put(fieldName, f);
         else
-            ArrayNode.class.cast(current).add(f);
+            ((ArrayNode) current).add(f);
     }
 
     private void addNull(JsonNode current) {
         assert current != null;
 
-        if (ObjectNode.class.isInstance(current))
-            ObjectNode.class.cast(current).putNull(fieldName);
+        if (current instanceof ObjectNode)
+            ((ObjectNode) current).putNull(fieldName);
         else
-            ArrayNode.class.cast(current).addNull();
+            ((ArrayNode) current).addNull();
     }
 
     private void addBoolean(JsonNode current, boolean b) {
         assert current != null;
 
-        if (ObjectNode.class.isInstance(current))
-            ObjectNode.class.cast(current).put(fieldName, b);
+        if (current instanceof ObjectNode)
+            ((ObjectNode) current).put(fieldName, b);
         else
-            ArrayNode.class.cast(current).add(b);
+            ((ArrayNode) current).add(b);
     }
 }

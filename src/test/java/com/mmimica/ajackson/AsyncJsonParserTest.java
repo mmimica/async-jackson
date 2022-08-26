@@ -6,7 +6,6 @@ import java.util.Arrays;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mmimica.ajackson.AsyncJsonParser;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.apache.commons.lang3.mutable.MutableBoolean;
@@ -93,9 +92,8 @@ public class AsyncJsonParserTest {
         byte[] bytes = new ObjectMapper().writeValueAsBytes(model);
         for (int i = 0; i < bytes.length; i += CHUNK_SIZE) {
             byte[] chunk = new byte[20];
-            int start = Math.min(bytes.length, i);
             int len = Math.min(CHUNK_SIZE, bytes.length - i);
-            System.arraycopy(bytes, start, chunk, 0, len);
+            System.arraycopy(bytes, i, chunk, 0, len);
             parser.consume(chunk, len);
         }
 
@@ -153,9 +151,8 @@ public class AsyncJsonParserTest {
         final int CHUNK_SIZE = 20;
         for (int i = 0; i < allBytes.length; i += CHUNK_SIZE) {
             byte[] chunk = new byte[20];
-            int start = Math.min(allBytes.length, i);
             int len = Math.min(CHUNK_SIZE, allBytes.length - i);
-            System.arraycopy(allBytes, start, chunk, 0, len);
+            System.arraycopy(allBytes, i, chunk, 0, len);
             System.out.println(new String(chunk));
             parser.consume(chunk, len);
         }
